@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bootcamp de Datos · Inscríbete</title>
+    <meta
+      name="description"
+      content="Programa intensivo de 12 semanas para reconvertirte profesionalmente y trabajar en datos."
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"
+    />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Bootcamp · Cohorte Junio 2026</span>
+          <h1>Conviértete en <em>Data Analyst</em> en 12 semanas</h1>
+          <p class="lead">
+            Aprende SQL, Python y visualización con instructores que trabajan en
+            la industria. 100% online, en vivo, con proyectos reales y bolsa de
+            empleo al finalizar.
+          </p>
+          <ul class="benefits">
+            <li>Clases en vivo de lunes a jueves</li>
+            <li>Mentorías 1:1 cada semana</li>
+            <li>Becas disponibles para perfiles destacados</li>
+            <li>Más de 200 empresas asociadas en LATAM</li>
+          </ul>
+          <a href="#form" class="cta">Quiero inscribirme</a>
+        </div>
+
+        <aside class="form-card" id="form">
+          <h2>Postula al programa</h2>
+          <p class="form-sub">
+            Te contactaremos en menos de 48 hs para una entrevista.
+          </p>
+
+          <form id="signup-form" novalidate>
+            <div class="field">
+              <label for="firstname">Nombre *</label>
+              <input
+                id="firstname"
+                name="firstname"
+                type="text"
+                required
+                autocomplete="given-name"
+              />
+            </div>
+
+            <div class="field">
+              <label for="lastname">Apellido *</label>
+              <input
+                id="lastname"
+                name="lastname"
+                type="text"
+                required
+                autocomplete="family-name"
+              />
+            </div>
+
+            <div class="field">
+              <label for="email">Email *</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autocomplete="email"
+              />
+            </div>
+
+            <div class="field">
+              <label for="phone">Teléfono</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder="+56 9 1234 5678"
+                autocomplete="tel"
+              />
+            </div>
+
+            <div class="field">
+              <label for="experiencia">¿Tenés experiencia con datos?</label>
+              <select id="experiencia" name="experiencia">
+                <option value="">Seleccioná una opción</option>
+                <option value="ninguna">Ninguna, parto de cero</option>
+                <option value="basica">Básica (Excel)</option>
+                <option value="intermedia">Intermedia (SQL)</option>
+                <option value="avanzada">Avanzada (Python / DS)</option>
+              </select>
+            </div>
+
+            <div class="field consent">
+              <label>
+                <input type="checkbox" id="consent" required />
+                Acepto que me contacten por email/teléfono para coordinar la
+                entrevista.
+              </label>
+            </div>
+
+            <button type="submit" id="submit-btn">Postular</button>
+          </form>
+
+          <div id="success" class="message success" hidden>
+            ¡Listo! Recibimos tu postulación. Te escribimos pronto.
+          </div>
+          <div id="error" class="message error" hidden></div>
+        </aside>
+      </div>
+    </header>
+
+    <section class="stats">
+      <div class="container stats-grid">
+        <div><strong>+1.500</strong><span>egresados</span></div>
+        <div><strong>92%</strong><span>de empleabilidad</span></div>
+        <div><strong>200+</strong><span>empresas aliadas</span></div>
+        <div><strong>4.8/5</strong><span>satisfacción</span></div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <small>© 2026 Demo CRM · Esto es una landing de demostración.</small>
+      </div>
+    </footer>
+
+    <script>
+      // Endpoint del CRM. El form_id se reemplaza al desplegar.
+      const CRM_BASE = "https://crm.agentsmind.ai";
+      const FORM_ID = "REPLACE_WITH_FORM_ID";
+
+      const form = document.getElementById("signup-form");
+      const successEl = document.getElementById("success");
+      const errorEl = document.getElementById("error");
+      const submitBtn = document.getElementById("submit-btn");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        successEl.hidden = true;
+        errorEl.hidden = true;
+
+        if (!form.consent.checked) {
+          errorEl.textContent = "Necesitamos tu consentimiento para continuar.";
+          errorEl.hidden = false;
+          return;
+        }
+
+        const fd = new FormData(form);
+        const payload = Object.fromEntries(fd.entries());
+        delete payload.consent;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Enviando...";
+
+        try {
+          const res = await fetch(`${CRM_BASE}/api/form-submit/${FORM_ID}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            const text = await res.text().catch(() => "");
+            throw new Error(`HTTP ${res.status} ${text}`);
+          }
+
+          successEl.hidden = false;
+          form.reset();
+          form.scrollIntoView({ behavior: "smooth", block: "center" });
+        } catch (err) {
+          errorEl.textContent =
+            "No se pudo enviar tu postulación. Escríbenos a contacto@desafiolatam.cl";
+          errorEl.hidden = false;
+          console.error(err);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Postular";
+        }
+      });
+    </script>
+  </body>
+</html>
